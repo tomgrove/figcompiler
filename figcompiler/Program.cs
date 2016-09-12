@@ -11,7 +11,7 @@ namespace figcompiler
     class Snapshot
     {
         const uint HeaderSize = 27;
-        const uint Origin     = 0x4000;
+        const uint Origin = 0x4000;
         byte[] Bytes;
 
         private uint AddressToOffset( UInt16 address )
