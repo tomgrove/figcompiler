@@ -1,0 +1,12 @@
+c:\users\tomgrove\documents\visual studio 2013\Projects\figcompiler\figcompiler\bin\Debug\figcompiler.exe.config
+c:\users\tomgrove\documents\visual studio 2013\Projects\figcompiler\figcompiler\obj\Debug\figcompiler.csprojResolveAssemblyReference.cache
+c:\users\tomgrove\documents\visual studio 2013\Projects\figcompiler\figcompiler\bin\Debug\figcompiler.exe
+c:\users\tomgrove\documents\visual studio 2013\Projects\figcompiler\figcompiler\bin\Debug\figcompiler.pdb
+c:\users\tomgrove\documents\visual studio 2013\Projects\figcompiler\figcompiler\obj\Debug\figcompiler.exe
+c:\users\tomgrove\documents\visual studio 2013\Projects\figcompiler\figcompiler\obj\Debug\figcompiler.pdb
+C:\Users\tom\OneDrive\Documents\figcompiler\figcompiler\bin\Debug\figcompiler.exe.config
+C:\Users\tom\OneDrive\Documents\figcompiler\figcompiler\obj\Debug\figcompiler.exe
+C:\Users\tom\OneDrive\Documents\figcompiler\figcompiler\obj\Debug\figcompiler.pdb
+C:\Users\tom\OneDrive\Documents\figcompiler\figcompiler\bin\Debug\figcompiler.exe
+C:\Users\tom\OneDrive\Documents\figcompiler\figcompiler\bin\Debug\figcompiler.pdb
+C:\Users\tom\OneDrive\Documents\figcompiler\figcompiler\obj\Debug\figcompiler.csprojResolveAssemblyReference.cache
