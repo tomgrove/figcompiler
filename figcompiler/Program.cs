@@ -53,6 +53,12 @@ namespace figcompiler
             uint offset = AddressToOffset(address);
             Bytes[offset] = b;
         }
+
+        public void SetStack(UInt16 address)
+        {
+            UInt16 Sp = (UInt16)(Bytes[23] + (Bytes[24] << 8));
+            SetWord(Sp, address);
+        }
  
     }
 
@@ -1018,6 +1024,8 @@ namespace figcompiler
                         break;
                     case CF.QTERMINAL:
                         Push(0);
+                        FImage.SetStack( 0x6105 );
+                        FImage.Save("d:\\wl_save.sna");
                         break;
                     case CF.TWOSTORE:
                         TwoStore();
