@@ -756,16 +756,7 @@ namespace figcompiler
 
         void StoD()
         {
-            var num = Pop();
-            Push(num);
-            if ( num >= 0x8000)
-            {
-                Push(0xffff);
-            }
-            else
-            {
-                Push(0);
-            }
+            PushDouble((UInt32)((Int16)Pop()));
         }
 
         UInt32 PopDouble()
@@ -788,7 +779,6 @@ namespace figcompiler
         {
             PushDouble(PopDouble() + PopDouble());
         }
-
 
         void Toggle()
         {
@@ -1148,11 +1138,11 @@ namespace figcompiler
         {
             var forth = new Forth();
             var image = new Snapshot();
-            image.Load("C:\\Users\\tom\\wl_tst.sna");
+            image.Load("..\\..\\..\\base.sna");
             forth.SetImage(image, 0x7099);
-           forth.Run(false);
+            forth.Run(false);
 
-            var tests = new Tests("C:\\Users\\tom\\wl_tst.sna");
+           var tests = new Tests("..\\..\\..\\base.sna");
         //    tests.Run();
         }
     }
