@@ -124,7 +124,9 @@ namespace figcompiler
             AND         = 0X63C5,
             DMINUS      = 0x6511,
             QTERMINAL   = 0x6305,
-            TWOSTORE    = 0x65EC
+            TWOSTORE    = 0x65EC,
+            RELOCATE    = 0x87f4,
+            BYE         = 0x798d
         };
 
         public Forth()
@@ -1027,8 +1029,15 @@ namespace figcompiler
                         FImage.SetStack( 0x6105 );
                         FImage.Save("d:\\wl_save.sna");
                         break;
+                    case CF.BYE:
+                        FImage.SetStack( 0x6101 );
+                        FImage.Save("d:\\wl_save.sna");
+                        return;
                     case CF.TWOSTORE:
                         TwoStore();
+                        break;
+                    case CF.RELOCATE:
+                        // don't actually need to relocate the sprites on the PC host
                         break;
                     default:
 
