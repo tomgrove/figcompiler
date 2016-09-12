@@ -363,14 +363,6 @@ namespace figcompiler
             Push(hl);
         }
 
-        void Xor()
-        {
-            var hl = Pop();
-            var de = Pop();
-            
-            Push( (UInt16)(hl ^ de));
-        }
-
         void LTZero()
         {
             Int16 hl = (Int16)Pop();
@@ -532,6 +524,11 @@ namespace figcompiler
             var de = Pop();
             UInt16 v = FImage.GetWord(hl);
             FImage.SetWord(hl, (UInt16)(v + de));
+        }
+
+        void Xor()
+        {
+            Push((UInt16)(Pop() ^ Pop()));
         }
 
         void Or()
@@ -739,7 +736,7 @@ namespace figcompiler
                 Push(0);
                 return;
             }
-            // needs to fail is < BASE
+           
             if ( v <  b )
             {
                 Push(v);
