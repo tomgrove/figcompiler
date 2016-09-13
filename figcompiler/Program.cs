@@ -132,6 +132,7 @@ namespace figcompiler
         public Forth()
         {
             Ip = XT = W = 0;
+            TakeInputFromFile = false;
         }
 
         Dictionary<UInt16, UInt16> CFAMap;
@@ -235,10 +236,72 @@ namespace figcompiler
             FImage.SetWord(CSP, value); ;
         }
 
+        bool IsWhitespace( char c )
+        {
+            return c == '\r' || c == '\n' || c == '\t';
+        }
+
+        string GetToken( char delim)
+        {
+            while( Offset < Source.Length &&  
+                  ( Source[ Offset ] == delim || IsWhitespace( Source[ Offset ] )))
+            {
+                Offset++;
+            }
+
+            string token = "";
+
+            if ( Offset == Source.Length )
+            {
+                TakeInputFromFile = false;
+            }
+
+            while( Offset < Source.Length && 
+                  Source[ Offset ] != delim && 
+                  !IsWhitespace( Source[ Offset ] ))
+            {
+                    token += Source[Offset];
+                    Offset++;
+            }
+
+            if ( Offset == Source.Length )
+            {
+                TakeInputFromFile = false;
+            }
+            else
+            {
+                Offset++;
+            }
+
+            return token;
+        }
+
         private void Interpret()
         {
             PushR(Ip);
             Ip = (UInt16)(W + 2);
+
+            if ( W == 0x6ce5 )
+            {
+                if ( TakeInputFromFile )
+                {
+                    UInt16 delim = Pop();
+                    UInt16 here = FImage.GetWord( 0xbbb2 );
+                    string token = GetToken( ( char) delim);
+                    FImage.SetByte(here, ( byte)(token.Length));
+                    for (int i = 0; i < token.Length; i++  )
+                    {
+                        byte c = (byte)(token[i] & 0xff);
+                        FImage.SetByte( (UInt16)(here + i + 1), c);
+                    }
+
+                    FImage.SetByte( (UInt16)(here + token.Length + 1), 32 );
+                    FImage.SetByte( (UInt16)(here + token.Length + 2), 32);
+
+                    Next();
+                    Exit();
+                }
+            }
         }
 
         private void Exit()
@@ -614,14 +677,21 @@ namespace figcompiler
 
         void Key()
         {
-            var key = (UInt16)Console.Read();
-            if (key != '\n')
+            if (TakeInputFromFile)
             {
-                Push(key);
+                Push('\r');
             }
             else
             {
-                Push(' ');
+                var key = (UInt16)Console.Read();
+                if (key != '\n')
+                {
+                    Push(key);
+                }
+                else
+                {
+                    Push(' ');
+                }
             }
         }
 
@@ -844,7 +914,7 @@ namespace figcompiler
             {
                 Next();
                 
-               // Trace(colons);
+               //Trace(colons);
        
                 switch ((CF)XT)
                 {
@@ -1026,12 +1096,12 @@ namespace figcompiler
                         break;
                     case CF.QTERMINAL:
                         Push(0);
-                        FImage.SetStack( 0x6105 );
-                        FImage.Save("d:\\wl_save.sna");
+                      //  FImage.SetStack( 0x6105 );
+                     //   FImage.Save("c:\\wl_save.sna");
                         break;
                     case CF.BYE:
                         FImage.SetStack( 0x6101 );
-                        FImage.Save("d:\\wl_save.sna");
+                        FImage.Save("..\\..\\..\\wl_save.sna");
                         return;
                     case CF.TWOSTORE:
                         TwoStore();
@@ -1061,11 +1131,21 @@ namespace figcompiler
 
         }
 
+        public void SetSource( string filename )
+        {
+            Source = File.ReadAllText(filename);
+            Offset = 0;
+            TakeInputFromFile = true;
+        }
+
         UInt16             XT;
         public UInt16      Ip;
         UInt16             W;
         public UInt16      Sp;
         Snapshot           FImage;
+        string             Source;
+        int                Offset;
+        bool               TakeInputFromFile;
     }
 
     class Tests
@@ -1157,6 +1237,7 @@ namespace figcompiler
             var image = new Snapshot();
             image.Load("..\\..\\..\\base.sna");
             forth.SetImage(image, 0x7099);
+            forth.SetSource("..\\..\\..\\test.f");
             forth.Run(false);
 
            var tests = new Tests("..\\..\\..\\base.sna");
