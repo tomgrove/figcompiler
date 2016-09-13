@@ -30,28 +30,59 @@ namespace figcompiler
         }
 
         public UInt16 GetWord( UInt16 address )
-        {
-            uint offset = AddressToOffset(address);
-            return (UInt16)(Bytes[offset] + Bytes[(offset + 1) % 65536] * 256);
+        { 
+            try
+            {
+                uint offset = AddressToOffset(address);
+                return (UInt16)(Bytes[offset] + Bytes[(offset + 1) % 65536] * 256);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return 0;
+            }
+
         }
 
         public void SetWord( UInt16 address, UInt16 word  )
         {
-            uint offset = AddressToOffset(address);
-            Bytes[offset] = (byte)(word & 255);
-            Bytes[ (offset+1) % 65536 ] = (byte)((word >> 8 ) & 255);
+            try
+            {
+                uint offset = AddressToOffset(address);
+                Bytes[offset] = (byte)(word & 255);
+                Bytes[(offset + 1) % 65536] = (byte)((word >> 8) & 255);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         public byte GetByte( UInt16 address )
         {
-            uint offset = AddressToOffset(address);
-            return Bytes[ offset ];
+            try
+            {
+                uint offset = AddressToOffset(address);
+                return Bytes[offset];
+            }
+            catch (Exception e )
+            {
+                Console.WriteLine(e);
+                return 0;
+            }
         }
 
         public void SetByte( UInt16 address, byte b)
         {
-            uint offset = AddressToOffset(address);
-            Bytes[offset] = b;
+            try
+            {
+                uint offset = AddressToOffset(address);
+                Bytes[offset] = b;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         public void SetStack(UInt16 address)
@@ -1101,7 +1132,7 @@ namespace figcompiler
                         break;
                     case CF.BYE:
                         FImage.SetStack( 0x6101 );
-                        FImage.Save("..\\..\\..\\wl_save.sna");
+                        FImage.Save(".\\zapped.sna");
                         return;
                     case CF.TWOSTORE:
                         TwoStore();
@@ -1237,10 +1268,14 @@ namespace figcompiler
             var image = new Snapshot();
             image.Load("..\\..\\..\\base.sna");
             forth.SetImage(image, 0x7099);
-            forth.SetSource("..\\..\\..\\test.f");
+            if (args.Length > 0)
+            {
+                forth.SetSource(args[0]);
+            }
+
             forth.Run(false);
 
-           var tests = new Tests("..\\..\\..\\base.sna");
+           //var tests = new Tests("..\\..\\..\\base.sna");
         //    tests.Run();
         }
     }
