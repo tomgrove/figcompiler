@@ -10,8 +10,8 @@ namespace figcompiler
 
     class Snapshot
     {
-        const uint HeaderSize = 27;
-        const uint Origin = 0x4000;
+        const uint HeaderSize   = 27;
+        const uint Origin       = 0x4000;
         byte[] Bytes;
 
         private uint AddressToOffset( UInt16 address )
@@ -90,7 +90,6 @@ namespace figcompiler
             UInt16 Sp = (UInt16)(Bytes[23] + (Bytes[24] << 8));
             SetWord(Sp, address);
         }
- 
     }
 
     class Forth
@@ -157,7 +156,8 @@ namespace figcompiler
             QTERMINAL   = 0x6305,
             TWOSTORE    = 0x65EC,
             RELOCATE    = 0x87f4,
-            BYE         = 0x798d
+            BYE         = 0x798d,
+            PROG        = 0x7b3d
         };
 
         public Forth()
@@ -529,7 +529,7 @@ namespace figcompiler
         void TwoFetch()
         {
             var hl = Pop();
-            var de = FImage.GetWord( (UInt16)(hl +2));
+            var de = FImage.GetWord( (UInt16)(hl + 2));
             Push( de );
             de = FImage.GetWord( (UInt16)(hl) );
             Push( de );
@@ -667,7 +667,6 @@ namespace figcompiler
                 Ip += 2;
                 SetRP( (UInt16)(rp + 4));
             }
-
         }
 
         void PlusLoop()
@@ -956,7 +955,7 @@ namespace figcompiler
                     case CF.EXIT:
                         Exit();
                         colons--;
-                        if ( colons == 0 && breakOnExit )
+                        if ( colons == 0 )
                         {
                             return;
                         }
@@ -1126,10 +1125,13 @@ namespace figcompiler
                         DMinus();
                         break;
                     case CF.QTERMINAL:
+                        // don't bother scanning for break
                         Push(0);
-                      //  FImage.SetStack( 0x6105 );
-                     //   FImage.Save("c:\\wl_save.sna");
                         break;
+                    case CF.PROG:
+                         FImage.SetStack( 0x6105 );
+                         FImage.Save(".\\warm.sna");
+                         return;
                     case CF.BYE:
                         FImage.SetStack( 0x6101 );
                         FImage.Save(".\\zapped.sna");
