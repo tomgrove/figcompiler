@@ -230,6 +230,9 @@ namespace figcompiler
         const UInt16 CSP = 0x6112;
         const UInt16 RP = 0x6128;
         const UInt16 UP = 0x6126;
+        const UInt16 WARM_EP = 0x6105;
+        const UInt16 COLD_EP = 0x6101;
+        public const UInt16 FORTH_COLD = 0x7099;
 
         private UInt16      GetRP()
         {   
@@ -737,7 +740,6 @@ namespace figcompiler
 
         void RpStore()
         {
-            const UInt16 UP = 0x6126;
             var up = FImage.GetWord(UP);
             var hl = FImage.GetWord((UInt16)(8 + up));
             SetRP(hl);
@@ -1136,11 +1138,11 @@ namespace figcompiler
                         Push(0);
                         break;
                     case CF.PROG:
-                         FImage.SetStack( 0x6105 );
+                         FImage.SetStack( WARM_EP );
                          FImage.Save(".\\warm.sna");
                          return;
                     case CF.BYE:
-                        FImage.SetStack( 0x6101 );
+                        FImage.SetStack( COLD_EP );
                         FImage.Save(".\\zapped.sna");
                         return;
                     case CF.TWOSTORE:
@@ -1206,7 +1208,7 @@ namespace figcompiler
             Snapshot = new Snapshot();
             Snapshot.Load(SnapshotFilename);
             Forth = new Forth();
-            Forth.SetImage(Snapshot, 0x7099 );
+            Forth.SetImage(Snapshot, Forth.FORTH_COLD );
         }
 
         private bool StacksAgree( int[] instack, string word, int[] outstack, bool reset  )
@@ -1217,7 +1219,7 @@ namespace figcompiler
             }
             else
             {
-                Forth.Ip = 0x7099;
+                Forth.Ip = Forth.FORTH_COLD;
             }
 
             foreach( var i in instack )
@@ -1227,7 +1229,7 @@ namespace figcompiler
             }
 
             Console.Write(" {0} ", word);
-            Snapshot.SetWord(0x7099, Forth.NameMap[word] );
+            Snapshot.SetWord( Forth.FORTH_COLD, Forth.NameMap[word] );
             Forth.Run(true);
 
             foreach( var i in outstack )
@@ -1282,7 +1284,7 @@ namespace figcompiler
             var forth = new Forth();
             var image = new Snapshot();
             image.Load("..\\..\\..\\base.sna");
-            forth.SetImage(image, 0x7099);
+            forth.SetImage(image, Forth.FORTH_COLD);
             if (args.Length > 0)
             {
                 forth.SetSource(args[0]);
