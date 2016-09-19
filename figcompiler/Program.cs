@@ -157,7 +157,9 @@ namespace figcompiler
             TWOSTORE    = 0x65EC,
             RELOCATE    = 0x87f4,
             BYE         = 0x798d,
-            PROG        = 0x7b3d
+            PROG        = 0x7b3d,
+            RPFETCH     = 0x6423,
+            PLUSLOOP    = 0x61e4
         };
 
         public Forth()
@@ -740,6 +742,11 @@ namespace figcompiler
             var hl = FImage.GetWord((UInt16)(8 + up));
             SetRP(hl);
         }
+
+        void RpFetch()
+        {
+            Push(GetRP());
+        }
     
         void Leave()
         {
@@ -944,7 +951,7 @@ namespace figcompiler
             {
                 Next();
                 
-               //Trace(colons);
+            //   Trace(colons);
        
                 switch ((CF)XT)
                 {
@@ -1141,6 +1148,12 @@ namespace figcompiler
                         break;
                     case CF.RELOCATE:
                         // don't actually need to relocate the sprites on the PC host
+                        break;
+                    case CF.RPFETCH:
+                        RpFetch();
+                        break;
+                    case CF.PLUSLOOP:
+                        PlusLoop();
                         break;
                     default:
 
