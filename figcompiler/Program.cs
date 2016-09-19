@@ -317,12 +317,15 @@ namespace figcompiler
             PushR(Ip);
             Ip = (UInt16)(W + 2);
 
-            if ( W == 0x6ce5 )
+            const UInt16 WORD_PFA   = 0x6ce5;
+            const UInt16 DP         = 0xbbb2;
+
+            if ( W == WORD_PFA )
             {
                 if ( TakeInputFromFile )
                 {
                     UInt16 delim = Pop();
-                    UInt16 here = FImage.GetWord( 0xbbb2 );
+                    UInt16 here = FImage.GetWord( DP );
                     string token = GetToken( ( char) delim);
                     FImage.SetByte(here, ( byte)(token.Length));
                     for (int i = 0; i < token.Length; i++  )
@@ -1278,7 +1281,6 @@ namespace figcompiler
 
     class Program
     {
-       
         static void Main(string[] args)
         {
             var forth = new Forth();
