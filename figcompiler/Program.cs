@@ -208,7 +208,7 @@ namespace figcompiler
         {
             CFAMap = new Dictionary<UInt16, UInt16>();
             NameMap = new Dictionary<string, UInt16>();
-            UInt16 latest =0X9E4F;
+            UInt16 latest = GetLatest(); // 0x9e4f;
             List<string> forth = new List<string>();
             do
             {
@@ -230,9 +230,16 @@ namespace figcompiler
         const UInt16 CSP = 0x6112;
         const UInt16 RP = 0x6128;
         const UInt16 UP = 0x6126;
+        const UInt16 LATEST = 0x6FF8;
         const UInt16 WARM_EP = 0x6105;
         const UInt16 COLD_EP = 0x6101;
         public const UInt16 FORTH_COLD = 0x7099;
+        public const UInt16 FORTH_WARM = 0x7080;
+
+        private UInt16 GetLatest()
+        {
+            return FImage.GetWord(LATEST);
+        }
 
         private UInt16      GetRP()
         {   
@@ -949,6 +956,77 @@ namespace figcompiler
             }
         }
 
+        public void Decompile()
+        {
+            UInt16 WordPtr = GetLatest();
+            do
+            {
+                var JumpTargets = new Dictionary<UInt16, bool>();
+                var Name = GetName(WordPtr);
+                Console.Write(": " + Name);
+                var CFA = FImage.GetWord( GetCFA(WordPtr));
+                if ( CFA == (UInt16)CF.DOCOLON)
+                {
+                    UInt16 Params = GetPFA(WordPtr);
+                    var WordCFA = FImage.GetWord(Params);
+                    while ( (UInt16)(WordCFA+2) != (UInt16)CF.EXIT && (UInt16)(WordCFA + 2) != 0x6a84)
+                    {
+                  
+                        UInt16 Word;
+                        UInt16 CFAPlus2 = (UInt16)(WordCFA + 2);
+                        if (CFAMap.TryGetValue(CFAPlus2, out Word))
+                        {
+
+                            if (CFAPlus2 == (UInt16)CF.LIT || CFAPlus2 == (UInt16)CF.BRANCH || CFAPlus2 == (UInt16)CF.ZBRANCH || CFAPlus2 == (UInt16)CF.LOOP || CFAPlus2 == (UInt16)CF.PLUSLOOP)
+                            {
+                                Params += 2;
+                                if (CFAPlus2 == (UInt16)CF.LIT)
+                                {
+                                    Console.Write(" " + ( short) FImage.GetWord(Params));
+                                }
+                                else
+                                {
+                     
+                                        short Target = (short)FImage.GetWord(Params);
+                                        Console.Write(" " + GetName(Word) + "("+Target+")");
+                                
+                                     
+                             
+                                }
+                                Params += 2;
+                            }
+                            else
+                            {
+                                //Console.Write(" " + GetName(Word));
+                                Params += 2;
+                                if (Word == 0x6b54 && Name  != ".\"")
+                                {
+                                    int length = FImage.GetByte(Params);
+                                    Params++;
+                                    Console.Write(" .\" " + ReadString(Params, (byte)length) + "\"");
+                                    Params += (UInt16)length;
+                                }
+                                else
+                                {
+                                    Console.Write(" " + GetName(Word));
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Params += 2;
+                        }
+
+                        WordCFA = FImage.GetWord(Params);
+                     
+                    }
+                }
+            
+                Console.WriteLine(" ;");
+                WordPtr = GetLink(WordPtr);
+            } while (WordPtr != 0);
+        }
+
         public void Run( bool breakOnExit )
         {
             int colons = 0;
@@ -956,7 +1034,7 @@ namespace figcompiler
             {
                 Next();
                 
-            //   Trace(colons);
+               // Trace(colons);
        
                 switch ((CF)XT)
                 {
@@ -1285,17 +1363,19 @@ namespace figcompiler
         {
             var forth = new Forth();
             var image = new Snapshot();
-            image.Load("..\\..\\..\\base.sna");
-            forth.SetImage(image, Forth.FORTH_COLD);
+            //image.Load("C:\\Users\\tomgrove\\source\\repos\\ConsoleApp3\\ConsoleApp3\\bin\\Debug\\sprites.sna"); // "d:\\racers.sna");
+            image.Load(args[1]); // "baked.sna"); // "d:\\racers.sna");
+            forth.SetImage(image, Forth.FORTH_WARM);
             if (args.Length > 0)
             {
                 forth.SetSource(args[0]);
             }
 
+            forth.Decompile();
             forth.Run(false);
 
-           //var tests = new Tests("..\\..\\..\\base.sna");
-        //    tests.Run();
+          // var tests = new Tests("..\\..\\..\\base.sna");
+          // tests.Run();
         }
     }
 }
