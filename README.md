@@ -1,5 +1,4 @@
 # figcompiler
-initial
 
 Support for building White Lightning Forth Programs on PC, as described in 
 
